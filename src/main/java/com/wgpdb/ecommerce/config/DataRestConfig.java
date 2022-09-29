@@ -1,7 +1,9 @@
 package com.wgpdb.ecommerce.config;
 
+import com.wgpdb.ecommerce.domain.Country;
 import com.wgpdb.ecommerce.domain.Product;
 import com.wgpdb.ecommerce.domain.ProductCategory;
+import com.wgpdb.ecommerce.domain.State;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
@@ -25,17 +27,20 @@ public class DataRestConfig implements RepositoryRestConfigurer {
     public void configureRepositoryRestConfiguration(RepositoryRestConfiguration config, CorsRegistry cors) {
         HttpMethod[] unsupportedActions = {HttpMethod.PUT, HttpMethod.POST, HttpMethod.DELETE};
 
-        config.getExposureConfiguration()
-                .forDomainType(Product.class)
-                .withItemExposure((metdata, httpMethods) -> httpMethods.disable(unsupportedActions))
-                .withCollectionExposure((metdata, httpMethods) -> httpMethods.disable(unsupportedActions));
+        disableHttpMethods(Product.class, config, unsupportedActions);
+        disableHttpMethods(ProductCategory.class, config, unsupportedActions);
+        disableHttpMethods(Country.class, config, unsupportedActions);
+        disableHttpMethods(State.class, config, unsupportedActions);
 
+        exposeId(config);
+    }
+
+    private void disableHttpMethods(Class theClass, RepositoryRestConfiguration config,
+                                    HttpMethod[] unsupportedActions) {
         config.getExposureConfiguration()
                 .forDomainType(ProductCategory.class)
                 .withItemExposure((metdata, httpMethods) -> httpMethods.disable(unsupportedActions))
                 .withCollectionExposure((metdata, httpMethods) -> httpMethods.disable(unsupportedActions));
-
-        exposeId(config);
     }
 
     private void exposeId(RepositoryRestConfiguration config) {
